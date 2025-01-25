@@ -1,8 +1,8 @@
-# Varios-Metros-Tree
+# Varios-Metros-Tree-NG+
 
-全名：数一亿粒米树
+全名：数一亿粒米树NG+
 
-作者：loader3229
+作者：loader3229 NG+作者：qwqe168
 
 An incremental game engine based on The Prestige Tree. It still requires programming knowledge, but it's mostly pretty easy things and copy/pasting.
 
