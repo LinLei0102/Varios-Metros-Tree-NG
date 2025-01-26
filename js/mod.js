@@ -1,6 +1,6 @@
 let modInfo = {
 	name: "数一亿粒米树ng+",
-	id: "countrice",
+	id: "countriceng",
 	author: "loader3229 and 22222",
 	pointsName: "粒米",
 	modFiles: ["layers.js", "tree.js"],
