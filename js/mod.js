@@ -13,7 +13,7 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.3",
+	num: "1.35",
 	name: "",
 }
 
@@ -50,7 +50,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	"作者：loader3229",
+	"作者：loader3229和22222",
 	function(){
 		if(getLevel().gte(10))return "米袋储量："+formatWhole(player.inactive);return "";
 	},
@@ -145,7 +145,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.tr.points.gte(1);
+	return player.x.points.gte(Decimal.pow(4,64));
 }
 
 
@@ -231,7 +231,7 @@ function getRank(){
 function getTier(){
 	let r=getRank().sub(400).div(60).max(0).floor();
 	if(r.gte(10)){
-		r=getRank().div(10).root(player.tr.points.gte(1)?player.tr.points.min(2).max(2).div(player.tr.points.add(1).pow(0.01)):2).max(0).floor();
+		r=getRank().div(hasUpgrade("p",15)?9:10).root(player.tr.points.gte(1)?player.tr.points.min(2).max(2).div(player.tr.points.add(1).pow(0.01)):2).max(0).floor();
 	}
 	return r;
 }
@@ -298,7 +298,7 @@ function getTierRequirement(c){
 	if(c.lt(10)){
 		f=c.mul(60).add(400);
 	}else{
-		f=c.pow(player.tr.points.gte(1)?player.tr.points.min(2).max(2).div(player.tr.points.add(1).pow(0.01)):2).mul(10);
+		f=c.pow(player.tr.points.gte(1)?player.tr.points.min(2).max(2).div(player.tr.points.add(1).pow(0.01)):2).mul(hasUpgrade("p",15)?9:10);
 	}
 	return f;
 }

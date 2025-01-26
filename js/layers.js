@@ -32,6 +32,7 @@ addLayer("p", {
 		if(getELevel().gte(1.3e8))mult = mult.mul(10);else if(getLevel().gte(30) && Math.random()<getLevel().mul(200).cbrt().div((getLevel().gte(50) && a)?100:200).max(0.1).min(2).toNumber())mult = mult.mul(2);
 		mult = mult.mul(layers.x.effect());
 		if(getTier().gte(1e10))mult = mult.pow(getTier().add(10).log(10))
+		if(hasUpgrade("p",14) )mult = mult.pow(player.p.points.add(10).log(10).log(10).pow(0.18))	
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -71,7 +72,26 @@ addLayer("p", {
 			},
 			unlocked() { return hasUpgrade("p",12) }, // The upgrade is only visible when this is true
 		},
-	
+		14:{
+			title: "金币升级4",
+			description(){
+				return "金币加成自身获取。"
+			},
+			cost(){
+				return new Decimal("e6e6");
+			},
+			unlocked() { return hasUpgrade("p",13) }, // The upgrade is only visible when this is true
+		},
+		15:{
+			title: "金币升级5",
+			description(){
+				return "阶层更便宜。"
+			},
+			cost(){
+				return new Decimal("e1e7");
+			},
+			unlocked() { return hasUpgrade("p",14) }, // The upgrade is only visible when this is true
+		},
 	},
 	clickables: {
             11: {
@@ -3043,6 +3063,51 @@ addLayer("a", {
 		    done() {return hasUpgrade("y",105)},
 		    tooltip: "解锁三重阶层。",
 	    },
+		291:{
+			name: "究极工厂群",
+			done() {return player.o.points.gte(150)},
+			tooltip: "拥有150个工厂。",
+		},
+		292:{
+		    name: "三重阶层纪元I",
+		    done() {return player.tr.points.gte(2)},
+		    tooltip: "获得2个三重阶层。",
+	    },
+		293:{
+			name: "超级米神 IX",
+			done() {return layers.s.effect6().add(10).log10().div(player.s.points.add(10).log10()).gte(100000) && player.s.points.gte("1e10000")},
+			tooltip: "米神的帮助数米指数超过100000。",
+		},
+		294:{
+		    name: "10000个0 IV",
+		    done() {return hasUpgrade("y",111)},
+		    tooltip: "有科技的效果基数是1e10000。",
+	    },
+		295:{
+			name: "即将渡劫",
+			done() {return player.x.points.gte(Decimal.pow(4,63))},
+			tooltip: "达到凝气·合·最终阶。",
+		},
+		296:{
+		    name: "三重阶层纪元II",
+		    done() {return player.tr.points.gte(3)},
+		    tooltip: "获得3个三重阶层。",
+	    },
+		297:{
+		    name: "阶层王者V",
+		    done() {return getTier().gte(1e12)},
+		    tooltip: "阶层达到一万亿。",
+	    },
+		301:{
+		    name: "反物质维度的平方!",
+		    done() {return player.points.gte("e8e31")},
+		    tooltip: "数e8e31粒米。",
+	    },
+		302:{
+		    name: "渡劫失败",
+		    done() {return player.x.points.gte(Decimal.pow(4,64))},
+		    tooltip: "进行1次渡劫,奖励:下次渡劫必定成功，不会因为境界过低而失去里程碑。",
+	    },
         },
 
 })
@@ -3288,7 +3353,7 @@ addLayer("g", {
 				return cost
 			},
 			effect(x=player[this.layer].buyables[this.id]) { // Effects of owning x of the items, x is a decimal
-				let eff = x.mul(layers.g.buyables[11].effectMult()).add(1);
+				let eff = x.mul(layers.g.buyables[11].effectMult().pow(player.o.points.gte(150)?player.o.points.add(10).log(10).pow(0.25):1)).add(1);
 				return eff;
 			},
 			effectMult(){
@@ -3928,8 +3993,8 @@ addLayer("i", {
 		mult = mult.mul(layers.i.buyables[41].effect());
 		mult = mult.mul(layers.et.buyables[12].effect());
 		if(player.o.points.gte(10))mult = mult.mul(player.a.points.add(1));
-		if(hasUpgrade("y",11))mult = mult.mul(100);
-		if(hasUpgrade("y",51))mult = mult.mul(new Decimal(100).pow(player.y.points));
+		if(hasUpgrade("y",11))mult = mult.mul(hasUpgrade("y",111)?"1e100000000":100);
+		if(hasUpgrade("y",51))mult = mult.mul(new Decimal(hasUpgrade("y",111)?"1e10000":100).pow(player.y.points));
 		if(hasUpgrade("y",71))mult = mult.mul(upgradeEffect("y",71));
         return mult
     },
@@ -4548,7 +4613,7 @@ addLayer("x", {
     exponent: 1.5, // Prestige currency exponent
 	base: 2,
     gainMult(a) { // Calculate the multiplier for main currency from bonuses
-        mult = new Decimal(layers.i.gainMult()).mul(getRank().sub(399).max(0).sqrt().min(100)).add(100).log10().pow(2).div(4);
+        mult = new Decimal(layers.i.gainMult()).mul(getRank().sub(399).max(0).sqrt().min(100)).add(100).log10().pow(2).div(4).mul(hasUpgrade("y",112)?player.y.points:1);
 		if(mult.gte(64)){
 			if(getTier().gte(19))mult = mult.mul(4).pow(1.5412735777995837194943431409894).add(mult.mul(300));
 			else mult = mult.sub(64).mul(4).pow(1.5412735777995837194943431409894).add(mult);
@@ -4596,7 +4661,7 @@ addLayer("x", {
 	tabFormat: [
 		"main-display",
 		["display-text",function(){
-			let p=player.x.points.log2().div(2).toNumber();
+			let p=player.x.points.log2().div(player.x.points.gte(Decimal.pow(4,64))?4:2).toNumber();
 			let q=["凝气","筑基"];
 			let r=["·起·","·承·","·转·","·合·"];
 			let s=["一阶","二阶","三阶","四阶","五阶","六阶","七阶","八阶","九阶","十阶","十一阶","十二阶","十三阶","十四阶","十五阶","最终阶"];
@@ -4795,6 +4860,21 @@ addLayer("x", {
             effectDescription: function(){
 				return "米神的帮助数米指数将会更高。";
 			},
+        },
+		{
+			requirementDescription: "达到凝气·合·最终阶",
+            done() {return player.x.points.gte(Decimal.pow(4,63))}, // Used to determine when to give the milestone
+            effectDescription: function(){
+				return "即将渡劫，如果成功，则获得大量加成，如果失败，则降低境界。";
+			},
+        },
+		{
+			requirementDescription: "渡劫失败",
+            done() {return player.x.points.gte(Decimal.pow(4,64))}, // Used to determine when to give the milestone
+            effectDescription: function(){
+				return "降低境界且提高下次渡劫需求。";
+			},
+			unlocked(){return player.x.points.gte(Decimal.pow(4,64))},  
         },
 	],
     layerShown(){return getRank().gte(400)},
@@ -5258,7 +5338,20 @@ addLayer("tr", {
 				return "阶层基于三重阶层更便宜。";
 			},
         },
-	
+		{
+			requirementDescription: "三重阶层2",
+            done() {return player.tr.points.gte(2)},
+            effectDescription: function(){
+				return "土地的第二个效果基于三重阶层更好。";
+			},
+        },
+		{
+			requirementDescription: "三重阶层3",
+            done() {return player.tr.points.gte(3)},
+            effectDescription: function(){
+				return "科技点更便宜。";
+			},
+        },
 	],
     layerShown(){return hasUpgrade("y",105)},
 	resetsNothing: true,
@@ -5759,6 +5852,13 @@ addLayer("o", {
 				return "让其中一个工厂转而生产永恒点数，使永恒点数乘以工厂的数量。";
 			},
         },
+		{
+			requirementDescription: "拥有150个工厂",
+            done() {return player[this.layer].points.gte(150)}, // Used to determine when to give the milestone
+            effectDescription: function(){
+				return "工作速度的加成基于工厂更好。";
+			},
+        },
 	],
 })
 
@@ -5809,7 +5909,7 @@ addLayer("u", {
 		return Decimal.pow(layers.i.buyables[42].effect(),player.u.points.gte(10000)?player.u.points.pow(1.4):player.u.points);
 	},
 	effect2(){
-		if(player.u.points.gte(750))return player.u.points;
+		if(player.u.points.gte(750))return player.u.points.mul(player.tr.points.gte(2)?player.tr.points.mul(2.5):1);
 		if(player.u.points.gte(450))return player.u.points.mul(0.2);
 		if(player.u.points.gte(200))return player.u.points.mul(0.05);
 		if(player.u.points.gte(123))return player.u.points.mul(0.01);
@@ -5919,7 +6019,7 @@ addLayer("y", {
     baseAmount() {return player.p.points}, // Get the current amount of baseResource
     type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent(){
-		return new Decimal(1.25);
+		return new Decimal(player.tr.points.gte(3)?1.225:1.25);
 	},  // Prestige currency exponent
 	base: 1e50,
     gainMult(a) { // Calculate the multiplier for main currency from bonuses
@@ -5959,7 +6059,7 @@ addLayer("y", {
 		11:{
 			title: "无限加成 I",
 			description(){
-				return "获得100倍无限点数。"
+				return  "获得"+(hasUpgrade("y",111)?"1e100000000":100)+"倍无限点数。"
 			},
 			cost(){
 				if(hasUpgrade("y",14)&&hasUpgrade("y",15))return new Decimal(5);
@@ -6206,7 +6306,7 @@ addLayer("y", {
 		51:{
 			title: "无限加成 II",
 			description(){
-				return "每个科技点使无限点数变为100倍，解锁新的无限可购买项。"
+				return "每个科技点使无限点数变为"+(hasUpgrade("y",111)?"1e10000":100)+"倍，解锁新的无限可购买项。"
 			},
 			cost(){
 				if(hasUpgrade("y",55))return new Decimal(29);
@@ -6322,7 +6422,7 @@ addLayer("y", {
 				return new Decimal(38);
 			},
 			effect(){
-				return Decimal.pow(10,player.et.points.add(10).log10().pow(hasUpgrade("y",85)?4:2));
+				return Decimal.pow(10,player.et.points.add(10).log10().pow(hasUpgrade("y",111)?"5":hasUpgrade("y",85)?4:2));
 			},
 			effectDisplay(){
 				return format(this.effect())+"x";
@@ -6500,7 +6600,7 @@ addLayer("y", {
 			unlocked() { return hasUpgrade("y",102); }, // The upgrade is only visible when this is true
 		},
 		104:{
-			title: "吃米加成 I  ",
+			title: "吃米加成 III  ",
 			description(){
 				return "吃米数量不小于数米数量。"
 			},
@@ -6518,6 +6618,26 @@ addLayer("y", {
 				return new Decimal(11400);
 			},
 			unlocked() { return hasUpgrade("y",104); }, // The upgrade is only visible when this is true
+		},
+		111:{
+			title: "科技加成 II",
+			description(){
+				return "这个科技正上方的所有带数字的科技更好。";
+			},
+			cost(){
+				return new Decimal(16666);
+			},
+			unlocked() { return hasUpgrade("y",105) }, // The upgrade is only visible when this is true
+		},
+		112:{
+			title: "修仙加成 II",
+			description(){
+				return "科技点加成修为获取。";
+			},
+			cost(){
+				return new Decimal(22800);
+			},
+			unlocked() { return hasUpgrade("y",111) }, // The upgrade is only visible when this is true
 		},
 	},
 	milestones: [
