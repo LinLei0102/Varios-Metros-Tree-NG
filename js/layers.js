@@ -61,7 +61,16 @@ addLayer("p", {
 			},
 			unlocked() { return hasUpgrade("p",11) }, // The upgrade is only visible when this is true
 		},
-	
+		13:{
+			title: "金币升级3",
+			description(){
+				return "金币加成永恒点数获取。"
+			},
+			cost(){
+				return new Decimal("e5.5e6");
+			},
+			unlocked() { return hasUpgrade("p",12) }, // The upgrade is only visible when this is true
+		},
 	
 	},
 	clickables: {
@@ -723,7 +732,7 @@ addLayer("e", {
 		mult = mult.mul(layers.s.effect2());
 		if(getTier().gte(3))mult = mult.mul(layers.n.effect());
 		if(player.x.points.gte(16))mult = mult.mul(layers.x.effect());
-        return mult
+        return  hasUpgrade("y",104)?mult.max(player.points):mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
@@ -3019,6 +3028,21 @@ addLayer("a", {
 		    done() {return player.points.gte("ee29")},
 		    tooltip: "数ee29粒米。",
 	    },
+		285:{
+		    name: "同步吃米",
+		    done() {return hasUpgrade("y",104)},
+		    tooltip: "吃米数量不小于数米数量。",
+	    },
+		286:{
+		    name: "阶层王者IV",
+		    done() {return getTier().gte(1e11)},
+		    tooltip: "阶层达到一千亿。",
+	    },
+		287:{
+		    name: "三重阶层",
+		    done() {return hasUpgrade("y",105)},
+		    tooltip: "解锁三重阶层。",
+	    },
         },
 
 })
@@ -3444,7 +3468,7 @@ addLayer("n", {
 	branches: ['p'],
 	update(diff){
 		if(hasUpgrade("y",84)){
-			player.n.points=player.n.points.add(player.points.add(10).log10().pow(player.n.buyables[11]).mul(layers.i.buyables[33].effect()).mul(player.n.points.add(1).pow(0.2)).mul(player.n.gen[0].add(1)).mul(diff).mul(layers.u.effect1()).mul(layers.x.effect()).mul(player.et.points.add(1)).mul(player.a.points.add(1)).mul(getTier().gte(1e9)?getTier().max(10).pow(getTier()):1));
+			player.n.points=player.n.points.add(player.points.add(10).log10().pow(player.n.buyables[11]).mul(layers.i.buyables[33].effect()).mul(player.n.points.add(1).pow(0.2)).mul(player.n.gen[0].add(1)).mul(diff).mul(layers.u.effect1()).mul(layers.x.effect()).mul(player.et.points.add(1)).mul(player.a.points.add(1)).mul(getTier().gte(1e9)?getTier().max(10).pow(getTier()):1).pow(getTier().gte(8e10)?getTier().add(10).log(10).pow(0.165):1));
 			for(var i=1;i<=19;i++){
 				player.n.progress[i]=player.n.progress[i].add(player.points.add(10).log10().pow(player.n.buyables[11].div(hasUpgrade("y",93)?1:15)).mul(layers.i.buyables[33].effect()).mul((i==1?player.n.points:player.n.gen[i-2]).pow(0.2)).mul(player.n.gen[i].add(1)).mul(diff).mul(layers.u.effect1()).mul(layers.x.effect()).mul(player.et.points.add(1)).mul(player.a.points.add(1)));
 				player.n.gen[i-1]=player.n.gen[i-1].add(player.n.progress[i].div(100).floor());
@@ -4809,9 +4833,7 @@ addLayer("r", {
 	},
 	tabFormat: [
 		"main-display",
-		["display-text",function(){if(player.r.points.gte(90))return "当前三重阶层："+formatWhole(getTier().div(10).sqrt().floor());}],
-		["display-text",function(){if(player.r.points.gte(16000))return "当前五重阶层："+formatWhole(getTier().div(1000).root(4).floor());}],
-		["display-text",function(){if(player.r.points.gte(10000000))return "当前六重阶层："+formatWhole(getTier().div(10000000).root(8).floor());}],
+	
 		["display-text",function(){return "下个阶层需要完成"+formatWhole(getTierRequirement(getTier().add(1)))+"个目标";}],
 		"milestones",
 	],
@@ -5187,8 +5209,58 @@ addLayer("r", {
 				return "阶层降低工厂的价格。";
 			},
         },
+		{
+			requirementDescription: "阶层8e10",
+            done() {return getTier().gte(8e10)}, // Used to determine when to give the milestone
+            effectDescription: function(){
+				return "阶层增加基因获取指数,但效果弱化。";
+			},
+        },
 	],
     layerShown(){return getRank().gte(460)},
+	resetsNothing: true,
+})
+addLayer("tr", {
+    name: "TR", // This is optional, only used in a few places, If absent it just uses the layer id.
+    symbol: "三重阶层", // This appears on the layer's node. Default is the id with the first letter capitalized
+    position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    startData() { return {
+        unlocked: true,
+		points: new Decimal(0),
+    }},
+    color: "#FFFFFF",
+    requires: new Decimal(1e11), // Can be a function that takes requirement increases into account
+    resource: "三重阶层", // Name of prestige currency
+    baseResource: "阶层", // Name of resource prestige is based on
+    baseAmount() {return player.r.points}, // Get the current amount of baseResource
+    type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+    exponent: 1.5, // Prestige currency exponent
+	base: 2,
+    gainMult() { // Calculate the multiplier for main currency from bonuses
+        return new Decimal(1)
+    },
+    gainExp() { // Calculate the exponent on main currency from bonuses
+        return new Decimal(1)
+    },
+    row: 4, // Row the layer is in on the tree (0 is the first row)
+    hotkeys: [
+    ],
+	
+	update(diff){
+		
+	},
+	
+	milestones: [
+		{
+			requirementDescription: "三重阶层1",
+            done() {return player.tr.points.gte(1)},
+            effectDescription: function(){
+				return "阶层基于三重阶层更便宜。";
+			},
+        },
+	
+	],
+    layerShown(){return hasUpgrade("y",105)},
 	resetsNothing: true,
 })
 
@@ -5219,6 +5291,7 @@ addLayer("et", {
 		if(hasUpgrade("y",35))mult = mult.mul(5);
 		if(player.x.points.gte(Decimal.pow(4,16)))mult=mult.mul(4);
 		if(player.o.points.gte(128))mult=mult.mul(player.o.points);
+		if(hasUpgrade("p",13))mult=mult.mul(player.p.points.add(10).log(10))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -5231,11 +5304,11 @@ addLayer("et", {
 	update(diff){
 		player.et.points=player.et.points.add(layers.et.gainMult().mul(diff));
 		player.et.buyables[11]=player.et.buyables[11].add(player.et.points.mul(diff));
-		player.et.buyables[12]=player.et.buyables[12].add(player.et.points.mul(diff));
+		player.et.buyables[12]=player.et.buyables[12].add(player.et.points.pow(hasUpgrade("et",32)?69420:1).mul(diff));
 
 		if(getRank().gte(10500000))player.et.buyables[13]=player.et.buyables[13].add(player.et.points.root(3).mul(diff));
 		if(getRank().gte(555555))player.et.buyables[21]=player.et.buyables[21].add(player.et.points.mul(diff));
-		if(hasUpgrade("et",11))player.et.buyables[22]=player.et.buyables[22].add(player.et.points.div(hasUpgrade("et",21)?1:hasUpgrade("et",14)?1e10:1e15).mul(diff));
+		if(hasUpgrade("et",11))player.et.buyables[22]=player.et.buyables[22].add(player.et.points.div(hasUpgrade("et",21)?1:hasUpgrade("et",14)?1e10:1e15).pow(hasUpgrade("et",31)?1.1:1).mul(diff));
 		if(hasUpgrade("et",25))player.et.buyables[23]=player.et.buyables[23].add(player.et.points.mul(diff));
 	},
 	buyables:{
@@ -5274,7 +5347,7 @@ addLayer("et", {
 				let data = tmp[this.layer].buyables[this.id]
 				return "等级："+formatWhole(player[this.layer].buyables[this.id])+"\n\
 				无限点数获取变为原来的" + formatWhole(data.effect) + "倍\n" +
-				("+"+format(player.et.points)+"/s");
+				("+"+format(player.et.points.pow(hasUpgrade("et",32)?69420:1))+"/s");
 			},
 			unlocked() { return true;}, 
 			canAfford() { return false;},
@@ -5344,7 +5417,7 @@ addLayer("et", {
 				let data = tmp[this.layer].buyables[this.id]
 				return "等级："+formatWhole(player[this.layer].buyables[this.id])+"\n\
 				工作速度等级变为原来的" + formatWhole(data.effect) + "倍\n" +
-				("+"+format(player.et.points.div(hasUpgrade("et",21)?1:hasUpgrade("et",14)?1e10:1e15))+"/s");
+				("+"+format(player.et.points.div(hasUpgrade("et",21)?1:hasUpgrade("et",14)?1e10:1e15).pow(hasUpgrade("et",31)?1.1:1))+"/s");
 			},
 			unlocked() { return hasUpgrade("et",11);}, 
 			canAfford() { return false;},
@@ -5545,6 +5618,26 @@ addLayer("et", {
 			},
 			unlocked() { return hasUpgrade("et",24); }, // The upgrade is only visible when this is true
 		},
+		31:{
+			title: "永恒升级11",
+			description(){
+				return "第5个永恒购买项的增加速度更快。"
+			},
+			cost(){
+				return new Decimal(1e41);
+			},
+			unlocked() { return hasUpgrade("et",25); }, // The upgrade is only visible when this is true
+		},
+		32:{
+			title: "永恒升级12",
+			description(){
+				return "第2个永恒购买项的增加速度更快。"
+			},
+			cost(){
+				return new Decimal(1e44);
+			},
+			unlocked() { return hasUpgrade("et",31); }, // The upgrade is only visible when this is true
+		},
 	},
 	effect(){
 	},
@@ -5689,10 +5782,12 @@ addLayer("u", {
     baseAmount() {return player.p.points}, // Get the current amount of baseResource
     type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent(){
+		if(player.u.points.gte(13500))return new Decimal(1.3);
 		if(hasUpgrade("y",65))return new Decimal(1.4);
 		return new Decimal(1.5);
 	},  // Prestige currency exponent
     base(){
+		if(player.u.points.gte(13500))return new Decimal(1e8);
 		if(hasUpgrade("y",65))return new Decimal(1e9);
 		return new Decimal(1e10);
 	},
@@ -5792,6 +5887,13 @@ addLayer("u", {
             done() {return player[this.layer].points.gte(10000)}, // Used to determine when to give the milestone
             effectDescription: function(){
 				return "土地的基因突变的加成更好。";
+			},
+        },
+		{
+			requirementDescription: "拥有13500块土地",
+            done() {return player[this.layer].points.gte(13500)}, // Used to determine when to give the milestone
+            effectDescription: function(){
+				return "土地的价格更便宜。";
 			},
         },
 	],
@@ -6396,6 +6498,26 @@ addLayer("y", {
 				return new Decimal(10375);
 			},
 			unlocked() { return hasUpgrade("y",102); }, // The upgrade is only visible when this is true
+		},
+		104:{
+			title: "吃米加成 I  ",
+			description(){
+				return "吃米数量不小于数米数量。"
+			},
+			cost(){
+				return new Decimal(11000);
+			},
+			unlocked() { return hasUpgrade("y",103); }, // The upgrade is only visible when this is true
+		},
+		105:{
+			title: "阶层加成 III  ",
+			description(){
+				return "解锁三重阶层。"
+			},
+			cost(){
+				return new Decimal(11400);
+			},
+			unlocked() { return hasUpgrade("y",104); }, // The upgrade is only visible when this is true
 		},
 	},
 	milestones: [
