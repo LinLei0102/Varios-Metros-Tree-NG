@@ -33,6 +33,7 @@ addLayer("p", {
 		mult = mult.mul(layers.x.effect());
 		if(getTier().gte(1e10))mult = mult.pow(getTier().add(10).log(10))
 		if(hasUpgrade("p",14) )mult = mult.pow(player.p.points.add(10).log(10).log(10).pow(0.18))	
+		if(getTier().gte(1e12))mult = mult.pow(player.tr.points.add(1).pow(0.5))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -91,6 +92,16 @@ addLayer("p", {
 				return new Decimal("e1e7");
 			},
 			unlocked() { return hasUpgrade("p",14) }, // The upgrade is only visible when this is true
+		},
+		21:{
+			title: "金币升级6",
+			description(){
+				return "金币的效果变得更好。"
+			},
+			cost(){
+				return new Decimal("e11111111");
+			},
+			unlocked() { return hasUpgrade("p",15) }, // The upgrade is only visible when this is true
 		},
 	},
 	clickables: {
@@ -315,7 +326,8 @@ addLayer("p", {
 	tabFormat: [
 		"main-display",
 		["display-text",function(){
-			if(hasUpgrade("et",12))return "您已经达到的最多的金币数量（"+format(player.p.best)+"）使您的无限点数获取×"+format(player.p.best.add(1).pow(hasUpgrade("p",11)?2:hasUpgrade("et",13)?1:0.1));
+			if(hasUpgrade("p",21))return "您已经达到的最多的金币数量（"+format(player.p.best)+"）使您的无限点数获取×"+format(player.p.best.add(1).pow(player.p.best.add(1e10).log(10).log(10)))+",^"+format(player.p.best.add(1e10).log(10).log(10).mul(0.1).add(1));
+			if(hasUpgrade("et",12))return "您已经达到的最多的金币数量（"+format(player.p.best)+"）使您的无限点数获取×"+format(hasUpgrade("p",11)?2:hasUpgrade("et",13)?1:0.1);
 			if(player.p.best.gte(Number.MAX_VALUE))return "您已经达到的最多的金币数量（"+format(player.p.best)+"）超过了无限，这使您的无限点数获取×"+format(Decimal.pow(2,player.p.best.add(2).log2().sqrt().sub(32).max(0)));return "";
 		}],
 		"upgrades","clickables","buyables","milestones"
@@ -1454,6 +1466,7 @@ addLayer("t", {
     baseAmount() {return player.points}, // Get the current amount of baseResource
     type: "none", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
 	base(){
+		if(hasUpgrade("y",112))return 1.01;
 		if(getTier().gte(60))return 1.1;
 		if(getTier().gte(54))return new Decimal(1.4).sub(getTier().mul(0.005));
 		if(getTier().gte(53))return 1.14;
@@ -3977,7 +3990,7 @@ addLayer("i", {
 		}
 		if(player.p.best.gte(Number.MAX_VALUE)){
 			if(hasUpgrade("et",12)){
-				mult = mult.mul(player.p.best.add(1).pow(hasUpgrade("p",11)?2:hasUpgrade("et",13)?1:0.1));
+				mult = mult.mul(player.p.best.add(1).pow(hasUpgrade("p",21)?player.p.best.add(1e10).log(10).log(10):hasUpgrade("p",11)?2:hasUpgrade("et",13)?1:0.1));
 			}else{
 				mult = mult.mul(Decimal.pow(2,player.p.best.add(2).log2().sqrt().sub(32).max(0)));
 			}
@@ -3996,6 +4009,7 @@ addLayer("i", {
 		if(hasUpgrade("y",11))mult = mult.mul(hasUpgrade("y",111)?"1e100000000":100);
 		if(hasUpgrade("y",51))mult = mult.mul(new Decimal(hasUpgrade("y",111)?"1e10000":100).pow(player.y.points));
 		if(hasUpgrade("y",71))mult = mult.mul(upgradeEffect("y",71));
+		mult = mult.pow(hasUpgrade("p",21)?player.p.best.add(1e10).log(10).log(10).mul(0.1).add(1):1);
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -5296,6 +5310,13 @@ addLayer("r", {
 				return "阶层增加基因获取指数,但效果弱化。";
 			},
         },
+		{
+			requirementDescription: "阶层1e12",
+            done() {return getTier().gte(1e12)}, // Used to determine when to give the milestone
+            effectDescription: function(){
+				return "三阶层增加金币获取指数,但效果弱化。";
+			},
+        },
 	],
     layerShown(){return getRank().gte(460)},
 	resetsNothing: true,
@@ -6019,7 +6040,7 @@ addLayer("y", {
     baseAmount() {return player.p.points}, // Get the current amount of baseResource
     type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent(){
-		return new Decimal(player.tr.points.gte(3)?1.225:1.25);
+		return new Decimal(player.tr.points.gte(3)?1.22:1.25);
 	},  // Prestige currency exponent
 	base: 1e50,
     gainMult(a) { // Calculate the multiplier for main currency from bonuses
@@ -6635,9 +6656,29 @@ addLayer("y", {
 				return "科技点加成修为获取。";
 			},
 			cost(){
-				return new Decimal(22800);
+				return new Decimal(22500);
 			},
 			unlocked() { return hasUpgrade("y",111) }, // The upgrade is only visible when this is true
+		},
+		113:{
+			title: "钻石加成 V",
+			description(){
+				return "极大幅度降低钻石升级的价格。";
+			},
+			cost(){
+				return new Decimal(25600);
+			},
+			unlocked() { return hasUpgrade("y",112) }, // The upgrade is only visible when this is true
+		},
+		114:{
+			title: "永恒加成 III",
+			description(){
+				return "每个科技点使永恒点数变为1.0001倍。";
+			},
+			cost(){
+				return new Decimal(29000);
+			},
+			unlocked() { return hasUpgrade("y",112) }, // The upgrade is only visible when this is true
 		},
 	},
 	milestones: [

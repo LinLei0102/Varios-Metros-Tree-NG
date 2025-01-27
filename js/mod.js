@@ -231,7 +231,7 @@ function getRank(){
 function getTier(){
 	let r=getRank().sub(400).div(60).max(0).floor();
 	if(r.gte(10)){
-		r=getRank().div(hasUpgrade("p",15)?9:10).root(player.tr.points.gte(1)?player.tr.points.min(2).max(2).div(player.tr.points.add(1).pow(0.01)):2).max(0).floor();
+		r=getRank().div(hasUpgrade("p",15)?8:10).root(player.tr.points.gte(1)?player.tr.points.min(2).max(2).div(player.tr.points.add(1).pow(0.01)):2).max(0).floor();
 	}
 	return r;
 }
@@ -298,7 +298,7 @@ function getTierRequirement(c){
 	if(c.lt(10)){
 		f=c.mul(60).add(400);
 	}else{
-		f=c.pow(player.tr.points.gte(1)?player.tr.points.min(2).max(2).div(player.tr.points.add(1).pow(0.01)):2).mul(hasUpgrade("p",15)?9:10);
+		f=c.pow(player.tr.points.gte(1)?player.tr.points.min(2).max(2).div(player.tr.points.add(1).pow(0.01)):2).mul(hasUpgrade("p",15)?8:10);
 	}
 	return f;
 }
