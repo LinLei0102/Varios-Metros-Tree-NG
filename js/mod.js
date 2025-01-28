@@ -13,7 +13,7 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.35",
+	num: "1.4",
 	name: "",
 }
 
@@ -40,6 +40,7 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = buyableEffect("p",11).mul(buyableEffect("p",12)).add(layers.s.effect6());
+	gain = gain.pow(hasUpgrade("p",22)?player.p.best.add(1e10).log(10).log(10).mul(0.1).add(1):1);
 	return gain
 }
 
@@ -145,7 +146,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.x.points.gte(Decimal.pow(4,64));
+	return player.y.points.gte(36500);
 }
 
 
